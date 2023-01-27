@@ -1,0 +1,19 @@
+1. Try to make the microservices communication as asynch as possible. That makes it loosley coupled.
+
+2. When you have multiple microserivces each with their own DB and they are communicating ayynchronously; then use "transactional 
+	messaging"
+	- WHY and WHAT
+		- In a normal approach, suppose in Order service, you will first update the database, then you will publish message
+			another service.
+		- The problem with this approach is, it is not transactional. It is possible that after the database update,
+			something happens and you service was not able to send the message.
+		- To solve this problem, after updating the main database with business logic, you should save the message in 
+			the database as well using the local traditional transcation of databases. And then this message will be sent
+			/pulled from other services. This ensures high availability.
+
+3. REST is simple and easy to use. gRPC is faster and could be bit complex and also has more flexibility.
+
+4. GRAPH QL is generally used to reduce overhead of an API response. Suppose we have a resource with 1000 fields, but we the client
+	only needs 2 field, that time, he should not be unnecessarily fetching all the 1000 fields. GRAPH QL lets us fetch only the
+	ones needed.
+	

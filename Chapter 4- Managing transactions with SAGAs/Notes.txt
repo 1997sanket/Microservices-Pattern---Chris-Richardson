@@ -1,0 +1,15 @@
+1. Try to make the inter-service communication as asycnhronous as possible. That means messaging. 
+
+2. But there is a problem with that. Suppose there is an ongoing SAGA, currently you are in Order service, you did some DB operation,
+	next step will be to send the message for the next service in SAGA. But we need to make sure that the DB operation and the 
+	message sending is an atmoic operation. Currently, it is not. It is possible that after doing DB operation something happens
+	and the message never goes to the broker. Because our DB operation followed ACID and is atomic, but messaging is not.
+
+3. So the obvious solution comes to mind is sending the message in the @Transactional service itself. But the problem is if something
+	happens, and the transaction has to rollback, our message couldn't be rolled back.
+
+4. In order to solve this problem, we need a temporary message broker i.e a DB table that will store our messages. And then our broker,
+	will take the messages from this table. That way, we wont lose any messages. This solution is OK, but there is another problem.
+	So, you must be thinking, the broker will just get the most recent record from the table. But, it is not necessary that the 
+	latest record is the one supposed to be queued in the broker. You see it is possible that we did 2 transactions, A and B 
+	in that order, but B got written fir
